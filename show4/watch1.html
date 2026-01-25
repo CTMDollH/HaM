@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>مشاهدة داني الشبح - الحلقة</title>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Arial", sans-serif;
+            background-color: #111;
+            color: #fff;
+        }
+        
+        .light-mode {
+            background-color: #f0f0f0;
+            color: #000;
+        }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            margin: 20px auto;
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .controls button {
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        
+        .controls button:hover {
+            background-color: #666;
+        }
+        
+        .mode-toggle {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 8px 12px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .mode-toggle:hover {
+            background-color: #666;
+        }
+        
+        .server-buttons {
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .server-buttons button {
+            background-color: #444;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+        
+        .episodes-section {
+            margin-top: 30px;
+            max-width: 1860px;
+            width: 95%;
+            margin: 30px auto;
+            padding: 20px;
+            border-radius: 9999px;
+            background-color: #333;
+        }
+        
+        .server-buttons button:hover {
+            background-color: #666;
+        }
+        
+        .settings-controls select,
+        .settings-controls button {
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: 2px solid#33333391;
+            background: #000;
+            color: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.10s;
+            outline: none;
+            background-color: #333;
+            color: #fff;
+        }
+        
+        .settings-controls button:hover,
+        .settings-controls select:hover {
+            background-color: #666;
+            color: #fff;
+        }
+        
+        .episode-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 7px;
+            margin-top: 10px;
+        }
+        
+        .ep-btn {
+            padding: 7px 25px;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            transition: 0.10s;
+            border: 2px solid#333;
+            text-decoration: none;
+            outline: none;
+            border-radius: 9999px;
+            background-color: #333;
+        }
+        
+        .ep-btn:hover,
+        .ep-btn.active {
+            background-color: #666;
+            color: #000;
+        }
+        
+        #loading-indicator {
+            display: none;
+            font-size: 13px;
+            color: #333;
+            margin-top: 5px;
+        }
+        
+        .settings-left,
+        .settings-right,
+        .settings-center {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 10px 25px;
+            flex-wrap: wrap;
+        }
+        
+        .settings-center {
+            justify-content: center;
+            flex-grow: 1;
+        }
+        
+        .episodes-section {
+            margin-top: 30px;
+            max-width: 1860px;
+            width: 95%;
+            margin: 30px auto;
+            padding: 20px;
+            border-radius: 9999px;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+        
+        .settings-controls {
+            margin-top: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        #volume-indicator {
+            position: absolute;
+            bottom: 60px;
+            right: 20px;
+            background: #333;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 13px;
+            z-index: 9999;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #fff;
+            font-size: 14px;
+            width: 100%;
+        }
+        
+        video {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16/9;
+            border-radius: 15px;
+            background: #000;
+            max-height: 500px;
+        }
+        
+        .description {
+            font-size: 15px;
+            margin-bottom: 20px;
+            color: #ccc;
+        }
+        
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="offline-container" style="padding: 20px;">
+        <h3 style="color: #1e90ff;">🎞️ الحلقات المتوفرة بدون إنترنت:</h3>
+        <div id="offline-cards" class="cards-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;"></div>
+    </section>
+
+    <!-- أزرار السيرفرات -->
+    <div class="server-buttons">
+        <button onclick="setServer(1)">السيرفر 1</button>
+        <button onclick="setServer(2)">السيرفر 2</button>
+        <button onclick="setServer(2)">السيرفر 3</button>
+
+    </div>
+
+    <!-- مشغل الفيديو -->
+    <div class="video-container">
+        <iframe id="video-frame" src="https://still-dawn-0125.lansr1234567.workers.dev/rrz3btwuh14y?autoplay=1" allow="autoplay" allowfullscreen></iframe>
+    </div>
+    <div id="volume-indicator">100%</div>
+    <div id="loading-indicator">جاري التحميل...</div>
+    </div>
+    </div>
+    <div class="episodes-section">
+        <div class="settings-controls">
+            <div class="settings-left">
+                <button onclick="prevEpisode()">⏭️ الحلقة السابقة</button>
+            </div>
+            <div class="settings-center">
+                <a href="index.html" class="ep-btn">العودة للرئيسية</a>
+                <button onclick="toggleMode()">🌙 الوضع الليلي</button>
+                <select id="quality" onchange="changeQuality()">
+                    <option value="380" selected> اختر الجودة</option>
+                    <option value="480p">480p</option>
+                    <option value="720p">720p</option>
+                    <option value="1080p">1080p</option>
+                </select>
+            </div>
+            <div class="settings-right">
+                <button onclick="nextEpisode()">الحلقة التالية⏮️</button>
+            </div>
+        </div>
+
+        <div class="episode-cards" id="episodes-list"></div>
+    </div>
+
+    <div class="footer">جميع الحقوق محفوظة &copy; HaM سينما 2025</div>
+
+    <div class="controls">
+    </div>
+
+    <script>
+        function setServer(serverNumber) {
+            const iframe = document.getElementById("video-frame");
+            if (serverNumber === 1) {
+                iframe.src = "https://still-dawn-0125.lansr1234567.workers.dev/rrz3btwuh14y?autoplay=1";
+            } else if (serverNumber === 2) {
+                iframe.src = "https://pixeldrain.com/api/file/XnPXosWB"; // ✏️ غيّر الرابط
+            } else if (serverNumber === 3) {
+                iframe.src = "https://pixeldrain.com/api/file/XnPXosWB"; // ✏️ غيّر الرابط
+            }
+        }
+
+        const currentEpisode = parseInt(window.location.pathname.match(/\d+/)) || 1;
+        const totalEpisodes = 30;
+
+        function prevEpisode() {
+            if (currentEpisode > 1) {
+                window.location.href = `watch${currentEpisode - 1}.html`;
+            }
+        }
+
+        function nextEpisode() {
+            if (currentEpisode < totalEpisodes) {
+                window.location.href = `watch${currentEpisode + 1}.html`;
+            }
+        }
+
+        function toggleMode() {
+            document.body.classList.toggle("light-mode");
+
+        }
+    </script>
+
+
+
+    <script>
+        // توليد أزرار الحلقات من 1 إلى 20 تلقائيًا
+        const episodesList = document.getElementById("episodes-list");
+        for (let i = 1; i <= 20; i++) {
+            const epButton = document.createElement("a");
+            epButton.href = `watch${i}.html`;
+            epButton.textContent = `الحلقة ${i}`;
+            epButton.className = "ep-btn";
+
+            // تفعيل الزر الحالي (تمييزه بلون مختلف)
+            if (i === currentEpisode) {
+                epButton.classList.add("active");
+            }
+
+            episodesList.appendChild(epButton);
+        }
+        const player = new Plyr('#player');
+
+        function increaseVolume() {
+            if (player.volume < 1) {
+                player.volume = Math.min(1, player.volume + 0.1);
+                showVolume();
+            }
+        }
+
+        function decreaseVolume() {
+            if (player.volume > 0) {
+                player.volume = Math.max(0, player.volume - 0.1);
+                showVolume();
+            }
+        }
+
+        function toggleMute() {
+            player.muted = !player.muted;
+            showVolume();
+        }
+
+        function showVolume() {
+            const volumeIndicator = document.getElementById("volume-indicator");
+            volumeIndicator.textContent = player.muted ? "مكتوم" : Math.round(player.volume * 100) + "%";
+            volumeIndicator.style.display = "block";
+            setTimeout(() => {
+                volumeIndicator.style.display = "none";
+            }, 1500);
+        }
+    </script>
+    <script src="https://unpkg.com/idb@7/build/iife/index-min.js"></script>
+    <script>
+        function renderOfflineCards() {
+            const container = document.getElementById("offline-cards");
+            if (!container) return;
+
+            const series = window.location.pathname.split("/")[1] ? .split(".")[0]; // تلقائي حسب اسم الملف
+            const episodes = JSON.parse(localStorage.getItem("offline-episodes") || "[]");
+            const filtered = episodes.filter(e => e.series === series);
+
+            if (!filtered.length) {
+                container.innerHTML = "<p style='color:gray;'>لا توجد حلقات مخزنة لهذا المسلسل.</p>";
+                return;
+            }
+
+            container.innerHTML = "";
+            filtered.forEach(e => {
+                const card = document.createElement("div");
+                card.style = "background:#222;padding:10px;border-radius:10px;text-align:center;color:#fff";
+
+                card.innerHTML = `
+      <img src="${e.thumbnail}" style="width:100%;border-radius:10px;max-height:200px;object-fit:cover;">
+      <p style="margin:10px 0;font-size:14px;">${e.title}</p>
+      <button onclick="playOffline('${e.url}')" style="padding:6px 10px;border:none;background:#1e90ff;border-radius:5px;color:#fff;">▶️ تشغيل بدون نت</button>
+    `;
+
+                container.appendChild(card);
+            });
+        }
+
+        async function playOffline(url) {
+            const video = document.querySelector("video");
+            const iframe = document.getElementById("video-frame");
+            const db = await idb.openDB("hamcinema", 1);
+            const blob = await db.get("videos", url);
+            if (!blob || !video) return alert("⚠️ الفيديو غير متاح.");
+
+            iframe ? .style && (iframe.style.display = "none");
+            video.style.display = "block";
+
+            const blobUrl = URL.createObjectURL(blob);
+            video.src = blobUrl;
+
+            const episodes = JSON.parse(localStorage.getItem("offline-episodes") || "[]");
+            const ep = episodes.find(e => e.url === url);
+            if (ep ? .time) video.currentTime = ep.time;
+
+            video.play();
+        }
+
+        renderOfflineCards();
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+
+</html>
